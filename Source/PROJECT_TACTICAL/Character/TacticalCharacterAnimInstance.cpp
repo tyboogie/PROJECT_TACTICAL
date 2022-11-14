@@ -32,4 +32,5 @@ void UTacticalCharacterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	bIsAccelerating = TacticalCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f ? true : false;
 	bWeaponEquipped = TacticalCharacter->IsWeaponEquipped();
 	bIsCrouched = TacticalCharacter->bIsCrouched;
+	bAiming = TacticalCharacter->IsAiming();
 }

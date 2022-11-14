@@ -17,11 +17,14 @@ public:
 	void EquipWeapon(class AWeapon* WeaponToEquip);
 protected:
 	virtual void BeginPlay() override;
+	void SetAiming(bool bIsAiming);
 
 private:
 	class ATacticalCharacter* Character;
 	AWeapon* EquippedWeapon;
-
+	
+	UPROPERTY()
+		bool bAiming;
 public:
 
 };
