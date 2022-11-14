@@ -3,6 +3,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "PROJECT_TACTICAL/TacticalComponents/CombatComponent.h"
+#include "PROJECT_TACTICAL/Weapon/Weapon.h"
 
 ATacticalCharacter::ATacticalCharacter()
 {
@@ -24,6 +26,10 @@ ATacticalCharacter::ATacticalCharacter()
 
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 }
 
 // Called when the game starts or when spawned
@@ -52,6 +58,18 @@ void ATacticalCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAxis("MoveRight", this, &ATacticalCharacter::MoveRight);
 	PlayerInputComponent->BindAxis("Turn", this, &ATacticalCharacter::Turn);
 	PlayerInputComponent->BindAxis("LookUp", this, &ATacticalCharacter::LookUp);
+	
+	PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &ATacticalCharacter::EquipButtonPressed);
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ATacticalCharacter::CrouchButtonPressed);
+}
+
+void ATacticalCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	if (Combat)
+	{
+		Combat->Character = this;
+	}
 }
 
 void ATacticalCharacter::MoveForward(float Value)
@@ -84,4 +102,46 @@ void ATacticalCharacter::LookUp(float Value)
 	AddControllerPitchInput(Value);
 }
 
+
+void ATacticalCharacter::EquipButtonPressed()
+{
+	if (Combat)
+	{
+		Combat->EquipWeapon(OverlappingWeapon);
+	}
+}
+
+void ATacticalCharacter::CrouchButtonPressed()
+{
+	if (bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Crouch();
+	}
+}
+
+void ATacticalCharacter::SetOverlappingWeapon(AWeapon* Weapon)
+{
+	if (OverlappingWeapon)
+	{
+		OverlappingWeapon->ShowPickupWidget(false);
+	}
+	
+	OverlappingWeapon = Weapon;
+	
+
+	if (OverlappingWeapon)
+	{
+		OverlappingWeapon->ShowPickupWidget(true);
+	}
+
+}
+
+bool ATacticalCharacter::IsWeaponEquipped()
+{
+	return (Combat && Combat->EquippedWeapon);
+}
 
