@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "PROJECT_TACTICAL/TacticalTypes/TurningInPlace.h"
 #include "TacticalCharacter.generated.h"
 
 UCLASS()
@@ -45,8 +46,12 @@ private:
 	class UCombatComponent* Combat;
 	
 	float AO_Yaw;
+	float InterpAO_Yaw;
 	float AO_Pitch;
 	FRotator StartingAimRotation;
+
+	ETurningInPlace TurningInPlace;
+	void TurnInPlace(float DeltaTime);
 	
 public:
 
@@ -54,6 +59,10 @@ public:
 	bool IsWeaponEquipped();
 	bool IsAiming();
 
+	//AimOffset pitch/yaw
 	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; }
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; }
+	
+	AWeapon* GetEquippedWeapon();
+	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
 };

@@ -5,6 +5,7 @@
 #include "TacticalCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "PROJECT_TACTICAL/Weapon/Weapon.h"
 
 
 void UTacticalCharacterAnimInstance::NativeInitializeAnimation()
@@ -32,8 +33,10 @@ void UTacticalCharacterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	bIsInAir = TacticalCharacter->GetCharacterMovement()->IsFalling();
 	bIsAccelerating = TacticalCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f ? true : false;
 	bWeaponEquipped = TacticalCharacter->IsWeaponEquipped();
+	EquippedWeapon = TacticalCharacter->GetEquippedWeapon();
 	bIsCrouched = TacticalCharacter->bIsCrouched;
 	bAiming = TacticalCharacter->IsAiming();
+	TurningInPlace = TacticalCharacter->GetTurningInPlace();
 
 	//yaw offset for strafing
 	FRotator AimRotation = TacticalCharacter->GetBaseAimRotation();
@@ -52,4 +55,14 @@ void UTacticalCharacterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	
 	AO_Yaw = TacticalCharacter->GetAO_Yaw();
 	AO_Pitch = TacticalCharacter->GetAO_Pitch();
+
+	if (bWeaponEquipped && EquippedWeapon && EquippedWeapon->GetWeaponMesh() && TacticalCharacter->GetMesh())
+	{
+		LeftHandTransform = EquippedWeapon->GetWeaponMesh()->GetSocketTransform(FName("LeftHandSocket"), ERelativeTransformSpace::RTS_World);
+		FVector OutPosition;
+		FRotator OutRotation;
+		TacticalCharacter->GetMesh()->TransformToBoneSpace(FName("hand_r"), LeftHandTransform.GetLocation(), FRotator::ZeroRotator, OutPosition, OutRotation);
+		LeftHandTransform.SetLocation(OutPosition);
+		LeftHandTransform.SetRotation(FQuat(OutRotation));
+	}
 }
